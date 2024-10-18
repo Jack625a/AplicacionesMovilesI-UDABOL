@@ -1,96 +1,99 @@
 import flet as ft
 
-
 def main(page: ft.Page):
+    page.title = "Gestión de Eventos para la Comunidad Educativa"
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.scroll = "auto"
+    page.theme_mode = ft.ThemeMode.LIGHT
 
-    #Crea la funcion para mostrar el contenido de cada opcion 
-    def contenidoNavegacion(index):
-        if index==0:
-            contenido.controls=[
-                ft.Text(value="Pantalla 1",size=50),
-                       ft.Image(src='https://avatars.githubusercontent.com/u/102273996?s=280&v=4'),
-                       ft.CupertinoButton(text='Boton de Prueba')
-                       ]
-        elif index==1:
-            contenido.controls=[
-                ft.Text(value="Pantalla Productos",size=40),
-                ft.Image(src='https://lavozdetarija.com/wp-content/uploads/2022/01/Celulares-Realme-8-5G.jpg',width=250)
-            ]
-        elif index==2:
-            contenido.controls=[
-                ft.Text(value="Pantalla Carrito Compras", size=40),
-                ft.Image(src='https://cdn-icons-png.flaticon.com/512/8146/8146003.png')
-            ]
-        elif index==3:
-            contenido.controls=[
-                ft.Text(value="Pantalla de Perfil", size=35)
-            ]
-        contenido.update()
+    # Lista para almacenar los eventos
+    events = []
 
-    #Actualizar la aplicacion con los nuevo cAMBIOS
-    navegacion=ft.NavigationRail(
-        selected_index=0,
-        label_type=ft.NavigationRailLabelType.ALL,
-        min_width=100,
-        min_extended_width=250,
-        leading=ft.Image(
-            src='https://avatars.githubusercontent.com/u/102273996?s=280&v=4',
-            width=100),
-            
-        destinations=[
-            ft.NavigationRailDestination(
-                icon_content=ft.Icon(ft.icons.HOME_SHARP),
-                selected_icon_content=ft.Icon(ft.icons.STOREFRONT),
-                label='Inicio',
-                padding=10
-          
-                ),
-            ft.NavigationRailDestination(
-                icon_content=ft.Icon(ft.icons.HOME_SHARP),
-                selected_icon_content=ft.Icon(ft.icons.STOREFRONT),
-                label='Productos',
-                padding=10
-          
-                ),
-            ft.NavigationRailDestination(
-                icon_content=ft.Icon(ft.icons.HOME_SHARP),
-                selected_icon_content=ft.Icon(ft.icons.STOREFRONT),
-                label='Carrito de Compras',
-                padding=10
-          
-                ),
-            ft.NavigationRailDestination(
-                icon_content=ft.Icon(ft.icons.HOME_SHARP),
-                selected_icon_content=ft.Icon(ft.icons.STOREFRONT),
-                label='Perfil',
-                padding=10
-          
-                )
-            
-        
+    # Función para agregar un evento
+    def add_event(e):
+        if not event_title.value or not event_description.value or not event_image_url.value:
+            page.dialog = ft.AlertDialog(
+                title=ft.Text("Error"),
+                content=ft.Text("El título, la descripción y la URL de la imagen son obligatorios."),
+                actions=[ft.TextButton("OK", on_click=lambda e: page.dialog.close())],
+            )
+            page.dialog.open = True
+            page.update()
+            return
+
+        # Crear un nuevo Card para el evento
+        new_event = ft.Card(
+            content=ft.Column(
+                [
+                    ft.Image(src=event_image_url.value, height=150, fit="cover"),
+                    ft.ListTile(
+                        title=ft.Text(event_title.value, weight="bold"),
+                        subtitle=ft.Text(event_description.value),
+                    ),
+                    ft.Row(
+                        [ft.ElevatedButton("Eliminar", on_click=lambda e: remove_event(new_event))],
+                        alignment=ft.MainAxisAlignment.END,
+                    ),
+                ],
+                spacing=10,
+                tight=True
+            ),
+            elevation=5,
+        )
+
+        # Agregar el evento a la lista y actualizar la página
+        events_list.controls.append(new_event)
+        events.append(new_event)
+        event_title.value = ""
+        event_description.value = ""
+        event_image_url.value = ""
+        page.update()
+
+    # Función para eliminar un evento
+    def remove_event(event):
+        events_list.controls.remove(event)
+        events.remove(event)
+        page.update()
+
+    # Campos de entrada para el título, la descripción y la URL de la imagen del evento
+    event_title = ft.TextField(label="Título del Evento", width=300)
+    event_description = ft.TextField(label="Descripción del Evento", width=300)
+    event_image_url = ft.TextField(label="URL de la Imagen del Evento", width=300)
+
+    # Botón para agregar evento
+    add_event_button = ft.ElevatedButton("Agregar Evento", on_click=add_event)
+
+    # Lista para mostrar los eventos como tarjetas
+    events_list = ft.Column(spacing=10, expand=True)
+
+    # Barra de navegación (AppBar)
+    page.appbar = ft.AppBar(
+        title=ft.Text("Gestión de Eventos"),
+        center_title=True,
+        bgcolor=ft.colors.BLUE,
+        actions=[
+            ft.IconButton(ft.icons.HOME, on_click=lambda e: page.go('/')),
+            ft.IconButton(ft.icons.EVENT, on_click=lambda e: page.go('/eventos')),
         ],
-        # Metodo para el cambio de opcion
-        on_change=lambda evento:contenidoNavegacion(evento.control.selected_index)
     )
 
-    #Crear contenedor para cada contenido de las opciones de la navegacion
-    contenido=ft.Column(
+    # Contenido principal
+    main_content = ft.Column(
         [
-        ft.Text(value="Pantalla 1",size=50),
-                       ft.Image(src='https://avatars.githubusercontent.com/u/102273996?s=280&v=4'),
-                       ft.CupertinoButton(text='Boton de Prueba')
-                       ],
-                      alignment=ft.MainAxisAlignment.START,
-                      expand=True
+            ft.Text("Agregar Nuevo Evento", style="headlineSmall"),
+            event_title,
+            event_description,
+            event_image_url,
+            add_event_button,
+            ft.Divider(),
+            ft.Text("Lista de Eventos", style="headlineSmall"),
+            events_list,
+        ],
+        tight=True
     )
 
-    #aÑADIR LOS COMPONENTES A LA APLICACION
-    
-    page.add(
-        ft.Row([
-            navegacion, ft.VerticalDivider(width=1),contenido
-        ],expand=True)
+    # Agregar el contenido principal a la página
+    page.add(main_content)
 
-    )
-
-ft.app(main)
+# Ejecutar la aplicación
+ft.app(target=main)
