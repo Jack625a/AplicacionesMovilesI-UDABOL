@@ -12,7 +12,7 @@ def main(page: ft.Page):
       animation_duration=1000,
       tabs=[
          ft.Tab(
-            text='Opcion 1',
+            text='Usuarios',
             icon=ft.icons.HOME,
             content=ft.Container(
                alignment=ft.alignment.top_center,
